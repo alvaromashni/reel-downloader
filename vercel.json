@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "functions": {
+    "api/download.py": {
+      "runtime": "@vercel/python@4.7.2"
+    }
+  },
+  "routes": [
+    { "src": "/api/download", "dest": "api/download.py" },
+    { "src": "/(.*)",         "dest": "/public/$1" }
+  ]
+}
