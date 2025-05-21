@@ -6,8 +6,10 @@ from download_reel import download_reel
 
 app = Flask(__name__)
 
-@app.route("/download", methods=["POST"])
+@app.route("/", methods=["POST"])
 def download_endpoint():
+    if request.method == "GET":
+        return "Envie um POST para baixar o Reel", 200
     url = request.form.get("url", "").strip()
     if not url:
         return "URL do Reel não informada", 400
