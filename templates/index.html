@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Instagram Reel Downloader</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>📥 Baixar Reel</h1>
+
+    
+    <!-- Loading indicator -->
+    <div id="loading" class="hidden">
+      Baixando, por favor aguarde…
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for category, msg in messages %}
+            <li class="flash {{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form id="download-form" action="{{ url_for('do_download') }}" method="POST">
+      <input 
+        type="text"
+        name="url"
+        placeholder="Cole a URL do Reel aqui"
+        required
+      >
+      <button type="submit">Baixar</button>
+    </form>
+  </div>
+
+  <!-- script para exibir o “carregando” -->
+  <script>
+       const form = document.getElementById('download-form');
+       const loading = document.getElementById('loading');
+        form.addEventListener('submit', () => {
+          loading.classList.remove('hidden');
+        });
+  </script>
+</body>
+</html>
