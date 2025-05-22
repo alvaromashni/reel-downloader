@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, redirect, url_for, flash
+from flask import Flask, request, render_template, send_file, send_from_directory, url_for, redirect, flash
 from download_reel import download_reel
 import os
 
@@ -7,7 +7,7 @@ app.secret_key = "uma_senha_aleatoria_para_sessions"
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+    return send_from_directory('template', 'index.html')
 
 @app.route("/download", methods=["POST"])
 def do_download():
