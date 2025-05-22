@@ -1,4 +1,4 @@
-#!/Users/mashnialvinho/Documents/dev_path/projetos/reelDownloader/.venv/bin/python
+#!/Users/mashnialvinho/Documents/dev_path/projetos/reelDownloader/.venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -1,9 +1,9 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
-import tempfile
-from flask import Flask, render_template, request, send_from_directory, url_for, redirect, flash
 from download_reel import download_reel
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(__name__, static_folder="static", template_folder="template")
+# Mude esta chave para algo secreto em produção
 app.secret_key = "uma_senha_aleatoria_para_sessions"
 
 @app.route("/", methods=["GET"])
@@ -17,30 +17,18 @@ def do_download():
         flash("❌ Por favor, insira a URL do Reel.", "error")
         return redirect(url_for("index"))
 
-    # Cria um diretório temporário
-    temp_dir = tempfile.mkdtemp()
+    # pasta onde vamos salvar
+    output_dir = "downloads"
+    os.makedirs(output_dir, exist_ok=True)
+
     try:
-        # Baixa o reel para temp_dir
-        download_reel(url, temp_dir)
-        # Encontra o .mp4
-        for nome in os.listdir(temp_dir):
-            if nome.lower().endswith(".mp4"):
-                # Envia como anexo; o browser abrirá “Salvar como…”
-                return send_from_directory(
-                    directory=temp_dir,
-                    filename=nome,
-                    as_attachment=True,
-                    attachment_filename=nome
-                )
-        # Se não encontrar .mp4, mostra erro
-        flash("❌ Erro: não encontrei o arquivo de vídeo.", "error")
-        return redirect(url_for("index"))
+        download_reel(url, output_dir)
+        flash(f"✅ Reel salvo em `{output_dir}`", "success")
     except Exception as e:
         flash(f"❌ Erro ao baixar: {e}", "error")
-        return redirect(url_for("index"))
-    finally:
-        # (Opcional) Se quiser limpar depois, você pode agendar uma limpeza periódica do /tmp
-        pass
+
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
+    # debug=True para recarregar automaticamente ao editar
     app.run(debug=True)
