@@ -20,15 +20,39 @@
       {% endif %}
     {% endwith %}
 
-    <form action="{{ url_for('do_download') }}" method="POST">
-      <input 
-        type="text"
-        name="url"
-        placeholder="Cole a URL do Reel aqui"
-        required
-      >
+    <form id="download-form">
+      <input type="text" name="url" placeholder="URL do Reel" required>
       <button type="submit">Baixar</button>
     </form>
+    
+    <script>
+    const form = document.getElementById("download-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      // mostra loading…
+      const resp = await fetch("/download", {
+        method: "POST",
+        body: data
+      });
+      if (!resp.ok) {
+        alert("Erro ao baixar o Reel");
+        return;
+      }
+      const blob = await resp.blob();
+      // cria um link temporário para “forçar” o download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      // você pode extrair o nome do arquivo do header Content-Disposition
+      a.download = "reel.mp4";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      // esconde loading…
+    });
+    </script>
   </div>
 </body>
 </html>
