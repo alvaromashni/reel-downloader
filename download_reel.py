@@ -1,36 +1,27 @@
 #!/usr/bin/env python3
 """
 download_reel.py
-Contém apenas a lógica de baixar o Reel e, em caso de erro,
-lança uma Exception para quem chamar tratar.
+Faz download de um Reel público do Instagram como MP4 compatível,
+usando yt-dlp, e retorna o caminho do arquivo gerado.
 """
+import os
+from yt_dlp import YoutubeDL
 
-from instaloader import Instaloader, Post
+def download_reel(url: str, output_dir: str) -> str:
+    # Garante que a pasta exista
+    os.makedirs(output_dir, exist_ok=True)
 
-def download_reel(url: str, output_dir: str = ".") -> None:
-    loader = Instaloader(
-        dirname_pattern=output_dir,
-        download_comments=False,
-        save_metadata=False
-    )
-    shortcode = url.rstrip("/").split("/")[-1]
-    # Se algo der errado aqui, uma Exception será lançada
-    post = Post.from_shortcode(loader.context, shortcode)
-    loader.download_post(post, target=output_dir)
+    # Configurações para baixar em MP4
+    ydl_opts = {
+        "format": "mp4",
+        "outtmpl": os.path.join(output_dir, "%(id)s.%(ext)s"),
+        # você pode descomentar para ver logs detalhados:
+        # "verbose": True,
+    }
 
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=True)
+        # prepare_filename usa as mesmas regras de outtmpl
+        filename = ydl.prepare_filename(info)
 
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) < 2:
-        print("Uso: python download_reel.py <URL_do_Reel> [diretório_de_saida]")
-        sys.exit(1)
-
-    url = sys.argv[1]
-    out = sys.argv[2] if len(sys.argv) >= 3 else "."
-
-    try:
-        download_reel(url, out)
-        print(f"✅ Reel salvo em {out}")
-    except Exception as e:
-        print(f"❌ Erro ao baixar: {e}")
+    return filename

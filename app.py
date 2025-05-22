@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-import os
+from flask import Flask, request, send_file, redirect, url_for, flash
 from download_reel import download_reel
+import os
 
 app = Flask(__name__, static_folder="static", template_folder="template")
-# Mude esta chave para algo secreto em produção
 app.secret_key = "uma_senha_aleatoria_para_sessions"
 
 @app.route("/", methods=["GET"])
@@ -17,18 +16,15 @@ def do_download():
         flash("❌ Por favor, insira a URL do Reel.", "error")
         return redirect(url_for("index"))
 
-    # pasta onde vamos salvar
-    output_dir = "downloads"
-    os.makedirs(output_dir, exist_ok=True)
-
     try:
-        download_reel(url, output_dir)
-        flash(f"✅ Reel salvo em `{output_dir}`", "success")
+        # Faz o download e obtém o caminho exato do arquivo
+        filepath = download_reel(url, "downloads")
+        # Envia para o cliente como anexo
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=os.path.basename(filepath)
+        )
     except Exception as e:
         flash(f"❌ Erro ao baixar: {e}", "error")
-
-    return redirect(url_for("index"))
-
-if __name__ == "__main__":
-    # debug=True para recarregar automaticamente ao editar
-    app.run(debug=True)
+        return redirect(url_for("index"))
